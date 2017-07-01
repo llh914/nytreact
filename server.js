@@ -12,6 +12,8 @@ var app = express();
 // Sets an initial port. We'll use this later in our listener
 var PORT = process.env.PORT || 3000;
 
+//var PORT = 8080;
+
 // Run Morgan for Logging
 app.use(logger("dev"));
 app.use(bodyParser.json());
@@ -36,11 +38,70 @@ db.once("open", function() {
 });
 
 // -------------------------------------------------
+//ROUTES
 
-//// Main "/" Route. This will redirect the user to our rendered React application
-//app.get("/", function(req, res) {
-//  res.sendFile(__dirname + "/public/index.html");
-//});
+// * `/api/saved` (get) - your components will use this to query MongoDB for all saved articles
+ app.get("/api/saved", function(req, res) {
+     Article.find({}).exec(function(err, doc) {
+        if (err) {
+          console.log(err);
+        }
+        else {
+          res.send(doc);
+        }
+     });
+ });
+
+// * `/api/saved` (post) - your components will use this to save an article to the database
+ app.post("/api/saved", function(req, res) {
+    // Save an empty result object
+      var article = {};
+
+      // Add the title and summary of every link, and save them as properties of the result object
+      article.title = req.body.headline.main;
+      article.date = req.body.pub_date;
+      article.url = req.body.web_url
+
+      // Using our Article model, create a new entry
+      // This effectively passes the result object to the entry (and the title and link)
+      var entry = new Article(article);
+
+      // Now, save that entry to the db
+      entry.save(function(err, doc) {
+        // Log any errors
+        if (err) {
+          console.log(err);
+          res.status(500).send(err);
+        }
+        // Or log the doc
+        else {
+          console.log(doc);
+          res.send(doc);
+        }
+      });
+
+ });
+
+// * `/api/saved` (delete) - your components will use this to delete a saved article in the database
+ app.delete("/api/saved/:id", function(req, res) {
+    Article.findOneAndRemove({"_id": req.params.id}, function(err, doc) {
+        console.log("deleted")
+        if (err) {
+          console.log(err);
+          res.status(500).send(err);
+        } else {
+            res.send(doc);
+        }
+    })
+
+ });
+
+// * `*` (get) - will load your single HTML page (with ReactJS) in public/index.html. Make sure you put this after all other GET routes
+
+// Main "/" Route. This will redirect the user to our rendered React application
+app.get("*", function(req, res) {
+  res.sendFile(__dirname + "/public/index.html");
+});
 //
 //// This is the route we will send GET requests to retrieve our most recent click data.
 //// We will call this route the moment our page gets rendered

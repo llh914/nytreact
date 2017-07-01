@@ -10,5 +10,22 @@ module.exports = {
 //  // This method takes in an argument for what to post to the database
 //  saveClicks: function(clickData) {
 //    return axios.post("/api", clickData);
-  }
+//  }
+
+    searchArticles: function(queryURL) {
+        return axios.get(queryURL)
+
+    },
+
+    saveArticle: function(article) {
+        return axios.post("/api/saved", article)
+    },
+
+    getSaved: function() {
+        return axios.get("/api/saved")
+    },
+
+    deleteArticle: function(article) {
+        return axios.delete("/api/saved/" + article._id)
+    }
 };
