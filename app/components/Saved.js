@@ -4,7 +4,10 @@ var React = require("react");
 // Requiring our helper for making API calls
 var helpers = require("../utils/helpers");
 
+// Create the Saved Component
 var Saved = React.createClass({
+
+//Render each saved article in a "well"
   renderSaved: function(article) {
     return (
       <div className ="well" key={article._id}>
@@ -16,18 +19,21 @@ var Saved = React.createClass({
     );
   },
 
+//Render all of the saved articles
   renderSavedArticles: function() {
     var articles = this.props.savedArticles;
     return articles.map(this.renderSaved)
 
   },
 
+//Delete an article to the database
   deleteArticle: function(article) {
     helpers.deleteArticle(article).then((res) => {
         this.props.onDelete(article)
     })
   },
 
+  // Render function
   render: function() {
     return (
       <div className="panel panel-primary">
@@ -35,6 +41,7 @@ var Saved = React.createClass({
           <h3 className="panel-title">Saved</h3>
         </div>
         <div className="panel-body">
+           {/* Dump the saved articles here*/ }
           {this.renderSavedArticles()}
         </div>
       </div>

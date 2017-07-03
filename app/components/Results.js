@@ -4,7 +4,10 @@ var React = require("react");
 // Requiring our helper for making API calls
 var helpers = require("../utils/helpers");
 
+// Create the Results Component
 var Results = React.createClass({
+
+//Render each result article in a "well"
   renderResult: function(result) {
      return (
           <div className ="well" key={result._id}>
@@ -16,15 +19,20 @@ var Results = React.createClass({
       );
     },
 
+//Render all of the result articles
   renderResults: function() {
     var results = this.props.results;
-    return results.map(this.renderResult)
+    return results && results.map(this.renderResult)
   },
 
+//Save an article to the database
   saveArticle: function(result) {
-    helpers.saveArticle(result)
+    helpers.saveArticle(result).then((res) => {
+      this.props.onSave(res.data)
+    })
   },
 
+  // Render function
   render: function() {
     return (
       <div className="panel panel-success">
@@ -32,7 +40,8 @@ var Results = React.createClass({
           <h3 className="panel-title">Results</h3>
         </div>
         <div className="panel-body">
-            {this.renderResults()}
+         {/* Dump the result articles here*/ }
+          {this.renderResults()}
         </div>
       </div>
     );

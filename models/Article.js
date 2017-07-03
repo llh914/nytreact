@@ -3,7 +3,7 @@ var mongoose = require("mongoose");
 
 var Schema = mongoose.Schema;
 
-// Create a Schema for capturing clicks. We'll use clickID to update the same clickCounter
+// Create a Schema for articles.
 var ArticleSchema = new Schema({
   title: {
     type: String,

@@ -11,10 +11,10 @@ var helpers = require("../utils/helpers");
 var Search = require("./Search");
 var Saved = require("./Saved");
 
-// Create the Parent Component
+// Create the Main Component
 var Main = React.createClass({
 
-  // Here we set the initial results and saved articles to empty arrays
+  // Set the initial results and saved articles to empty arrays
   getInitialState: function() {
     return {
       results: [],
@@ -22,10 +22,24 @@ var Main = React.createClass({
     };
   },
 
+//  Set results state after receiving results from article search
   onResults: function(results) {
     this.setState({ results: results });
   },
 
+//  Update saved state after user saves an article
+  onSave: function(article) {
+    var saved = this.state.saved;
+    var index = saved.map(function(x) {return x._id; }).indexOf(article._id);
+    if (index === -1) {
+      saved.push(article);
+    } else {
+      saved[index] = article
+    }
+    this.setState({ saved })
+  },
+
+//  Update saved state after user deletes an article
   onDelete: function(deleted) {
     var saved = this.state.saved;
     var index = saved.indexOf(deleted);
@@ -43,75 +57,36 @@ var Main = React.createClass({
         this.setState({saved: response.data})
      })
   },
-  // Whenever our component updates, the code inside componentDidUpdate is run
-  componentDidUpdate: function(prevState) {
-    console.log("COMPONENT UPDATED");
-//
-//    // We will check if the click count has changed...
-//    if (prevState.clicks !== this.state.clicks) {
-//
-//      // If it does, then update the clickcount in MongoDB
-//      helpers.saveClicks({ clickID: this.state.clickID, clicks: this.state.clicks })
-//        .then(function() {
-//          console.log("Posted to MongoDB");
-//        });
-//    }
-  },
-  // Whenever the button is clicked we'll use setState to add to the clickCounter
-  // Note the syntax for setting the state
-//  handleClick: function() {
-//    this.setState({ clicks: this.state.clicks + 1 });
-//  },
 
-  // Whenever the button is clicked we'll use setState to reset the clickCounter
-  // This will reset the clicks -- and it will be passed ALL children
-//  resetClick: function() {
-//    this.setState({ clicks: 0 });
-//  },
-
-  // Here we render the function
+  // Render function
   render: function() {
+    const styles = {
+        margin: "5px",
+    };
     return (
       <div className="container">
           <div className="jumbotron text-center">
-            <h2>New York Times Search</h2>
+            <h1><strong><i className="fa fa-newspaper-o"></i> New York Times Search</strong></h1>
             <hr />
             <p>
-              <em>Search for New York Times Articles and save them.</em>
-            </p>
-            <p>
-              {/*
-                Here we create a button click.
-                Note how we have an onClick event associate with our handleClick function.
-              */}
-              {/*<button
-                className="btn btn-primary btn-lg"
-                type="button"
-                {onClick={this.handleClick}}
-              >
-                CLICK ME!!!!
-              </button>
-              */}
-
-              {/* Here we create a button click for resetting the clickCounter */}
-             {/* <button
-                className="btn btn-danger btn-lg"
-                type="button"
-                onClick={this.resetClick}
-              >
-                Reset
-              </button>
-              */}
+              <em>Search for New York Times Articles and save them</em>
             </p>
           </div>
-          <Search
-            results={this.state.results}
-            onResults={this.onResults}
-          />
-          <Saved
-            savedArticles={this.state.saved}
-            onDelete={this.onDelete}
-          />
+           <p>
+              <Link to="/Search"><button className="btn btn-primary btn-md" style={styles} ><i className="fa fa-search"></i> Search</button></Link>
+              <Link to="/Saved"><button className="btn btn-primary btn-md" style={styles} ><i className="fa fa-floppy-o"></i> Saved</button></Link>
+            </p>
+          {
+              React.Children.map(this.props.children, child =>
+                  React.cloneElement(this.props.children, {
+                    results: this.state.results,
+                    onResults: this.onResults,
+                    onSave: this.onSave,
+                    savedArticles: this.state.saved,
+                    onDelete: this.onDelete
+                  })
+              )
+          }
       </div>
     );
   }
